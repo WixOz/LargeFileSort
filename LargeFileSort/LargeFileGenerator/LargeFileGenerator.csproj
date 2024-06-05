@@ -8,12 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\..\.gitignore">
-        <Link>SolutionItems\.gitignore</Link>
-      </Content>
-      <Content Include="..\..\README.md">
-        <Link>SolutionItems\README.md</Link>
-      </Content>
+      <None Update="Phrases.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

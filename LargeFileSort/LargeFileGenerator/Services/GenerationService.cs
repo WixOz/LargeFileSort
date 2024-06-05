@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace LargeFileGenerator.Services;
 
 public static class GenerationService
 {
+    private const int EolLength = 2;
+    
+    private static IList<string>? _phrases;
     private static int GenerationOption { get; set; } = 1;
-    private static string FileDateTime { get; } = $"{DateTime.UtcNow:ddMMyy_hhmmss}"; 
+    private static string FileDateTime { get; } = $"{DateTime.UtcNow:ddMMyy_hhmmss}";
 
     /// <summary>
     /// Method which run before generation file.
@@ -15,13 +19,13 @@ public static class GenerationService
     /// <exception cref="InvalidDataException">Throws when file size option was incorrect.</exception>
     public static void PreGeneration()
     {
-        Console.WriteLine("Generator started. Choose one option:\n1) 1Gb file.\n2) 10Gb file.\n3) 100Gb file.\n\nYour option:");
+        Console.WriteLine("Generator started. Choose one option:\n1) 1Gb file.\n2) 10Gb file.\n\nYour option:");
     
         try
         {
             var generationOption = Convert.ToInt32(Console.ReadLine());
 
-            if (generationOption is < 1 or > 3)
+            if (generationOption is < 1 or > 2)
             {
                 throw new InvalidDataException();
             }
@@ -35,9 +39,23 @@ public static class GenerationService
         }
     }
 
+    /// <summary>
+    /// Method for generating large file with selected option.
+    /// </summary>
     public static void Generate()
     {
+        LoadPhrases();
+
+        var rnd = new Random();
+        using var w = new StreamWriter(GetFileName(), false);
+        long fileSize = 0;
         
+        while (fileSize < GetLongSize())
+        {
+            var line = $"{rnd.Next(500000)}. {_phrases?[rnd.Next(0, _phrases.Count - 1)]}";
+            fileSize += line.Length+EolLength;
+            w.WriteLine(line);
+        }
     }
 
     /// <summary>
@@ -58,8 +76,28 @@ public static class GenerationService
         return GenerationOption switch
         {
             2 => "10Gb",
-            3 => "100Gb",
             _ => "1Gb"
         };
+    }
+    
+    private static long GetLongSize()
+    {
+        const long oneGb = 1024 * 1024 * 1024;
+        return GenerationOption switch
+        {
+            2 => 10*oneGb,
+            _ => oneGb
+        };
+    }
+
+    private static void LoadPhrases()
+    {
+        using var reader = new StreamReader("Phrases.txt");
+        _phrases = new List<string>();
+
+        while (reader.ReadLine() is { } line)
+        {
+            _phrases.Add(line);
+        }
     }
 }
