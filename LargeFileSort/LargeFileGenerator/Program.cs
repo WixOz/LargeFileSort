@@ -1,3 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using LargeFileGenerator.Services;
 
-Console.WriteLine("Hello, World!");
+GenerationService.PreGeneration();
+GenerationService.Generate();
+GenerationService.PostGeneration();
