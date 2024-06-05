@@ -1,3 +1,3 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using LargeFileSorter.Services;
 
-Console.WriteLine("Hello, World!");
+SortingService.PreSorting();
