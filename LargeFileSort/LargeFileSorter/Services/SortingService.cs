@@ -28,7 +28,7 @@ public static class SortingService
     private static IList<string> LoadFilesForSort()
     {
         var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        var files = Directory.GetFiles(root, "*.txt");
+        var files = Directory.EnumerateFiles(root, "*.txt");
         return new List<string>();
     }
 }
