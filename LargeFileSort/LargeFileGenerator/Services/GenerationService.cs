@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace LargeFileGenerator.Services;
@@ -9,6 +10,8 @@ public static class GenerationService
     private const int EolLength = 2;
     
     private static IList<string>? _phrases;
+
+    private static Stopwatch _watcher = new Stopwatch();
     private static int GenerationOption { get; set; } = 1;
     private static string FileDateTime { get; } = $"{DateTime.UtcNow:ddMMyy_hhmmss}";
 
@@ -37,6 +40,8 @@ public static class GenerationService
             Console.WriteLine("Incorrect option!");
             throw;
         }
+        
+        _watcher.Start();
     }
 
     /// <summary>
@@ -47,14 +52,14 @@ public static class GenerationService
         LoadPhrases();
 
         var rnd = new Random();
-        using var w = new StreamWriter(GetFileName(), false);
+        using var writer = new StreamWriter(GetFileName(), false);
         long fileSize = 0;
         
         while (fileSize < GetLongSize())
         {
             var line = $"{rnd.Next(500000)}. {_phrases?[rnd.Next(0, _phrases.Count - 1)]}";
             fileSize += line.Length+EolLength;
-            w.WriteLine(line);
+            writer.WriteLine(line);
         }
     }
 
@@ -63,7 +68,9 @@ public static class GenerationService
     /// </summary>
     public static void PostGeneration()
     {
+        _watcher.Stop();
         Console.WriteLine($"File generated successfully. File name is {GetFileName()}");
+        Console.WriteLine($"Execution Time: {_watcher.ElapsedMilliseconds / 1000f} s.");
     }
     
     private static string GetFileName()
